@@ -24,11 +24,15 @@ module Travis
         end
       end
 
-      private
+      def process!
+        targets.each { |target| send_lines(target, message) }
+      end
 
-        def process
-          targets.each { |target| send_lines(target, message) }
-        end
+      def process?
+        targets.any?
+      end
+
+      private
 
         def send_lines(target, lines)
           url, token = parse(target)

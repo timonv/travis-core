@@ -14,17 +14,17 @@ describe Travis::Notification::Instrument::Task::Campfire do
     Travis::Features.stubs(:active?).returns(false)
     Repository.stubs(:find).returns(stub('repo'))
     Url.stubs(:shorten).returns(url)
-    task.stubs(:process)
-    task.run
+    task.stubs(:process!)
+    task.process
   end
 
   it 'publishes a payload' do
     event.except(:payload).should == {
-      :message => "travis.task.campfire.run:completed",
+      :message => "travis.task.campfire.process:completed",
       :uuid => Travis.uuid
     }
     event[:payload].except(:data).should == {
-      :msg => 'Travis::Task::Campfire#run for #<Build id=1>',
+      :msg => 'Travis::Task::Campfire#process for #<Build id=1>',
       :repository => 'svenfuchs/minimal',
       :object_id => 1,
       :object_type => 'Build',
