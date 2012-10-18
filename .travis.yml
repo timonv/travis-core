@@ -20,7 +20,7 @@ matrix:
     - rvm: jruby-head
       jdk: oraclejdk7
 before_script:
-  - 'RAILS_ENV=test rake db:create db:schema:load --trace'
+  - 'RAILS_ENV=test rake db:create db:structure:load --trace'
 script:
   - './build.sh'
 notifications:
