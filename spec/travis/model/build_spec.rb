@@ -99,15 +99,6 @@ describe Build do
       end
     end
 
-    describe 'next_number' do
-      it 'returns the next build number' do
-        1.upto(3) do |number|
-          Factory(:build, :repository => repository, :number => number)
-          repository.builds.next_number.should == number + 1
-        end
-      end
-    end
-
     describe 'pushes' do
       before do
         Factory(:build)
@@ -135,8 +126,17 @@ describe Build do
 
   describe 'instance methods' do
     it 'sets its number to the next build number on creation' do
+      repository = Factory(:repository)
+
+      1.upto(5) do |number|
+        Factory(:build, :repository => repository).reload.number.should == number.to_s
+      end
+
+      # make sure that it will take MAX(number) for given repo, not all the repos
+      repository = Factory(:repository, :name => 'foo')
+
       1.upto(3) do |number|
-        Factory(:build).reload.number.should == number.to_s
+        Factory(:build, :repository => repository).reload.number.should == number.to_s
       end
     end
 
