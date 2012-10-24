@@ -4,7 +4,7 @@ require 'spec_helper'
 describe Travis::Mailer::Build do
   include Travis::Testing::Stubs
 
-  let(:data)       { Travis::Api.data(build, :for => 'event', :version => 'v2') }
+  let(:data)       { Travis::Api.data(build, :for => 'event', :version => 'v0') }
   let(:recipients) { ['owner@example.com', 'committer@example.com', 'author@example.com'] }
   let(:email)      { Travis::Mailer::Build.finished_email(data, recipients) }
 
@@ -13,7 +13,7 @@ describe Travis::Mailer::Build do
     I18n.reload!
     ActionMailer::Base.delivery_method = :test
     build.commit.stubs(:author_name).returns('まつもとゆきひろ a.k.a. Matz')
-    Broadcast.stubs(:by_repo).with(build.repository_id).returns([])
+    Broadcast.stubs(:by_repo).with(build.repository_id).returns([broadcast])
   end
 
   describe 'finished build email notification' do
