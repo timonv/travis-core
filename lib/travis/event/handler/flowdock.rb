@@ -11,8 +11,15 @@ module Travis
 
         EVENTS = /build:finished/
 
+        attr_reader :payload
+
+        def initialize(*)
+          super
+          @payload = Api.data(object, :for => 'event', :version => API_VERSION) if handle?
+        end
+
         def handle?
-          config.send_on_finish?
+          config.send_on_finish? && targets.present?
         end
 
         def handle
@@ -23,15 +30,13 @@ module Travis
           @targets ||= config.rooms
         end
 
-        def payload
-          @payload ||= Api.data(object, :for => 'event', :version => API_VERSION)
-        end
+        private
 
-        def config
-          @config ||= Config::Flowdock.new(object)
-        end
+          def config
+            @config ||= Config::Flowdock.new(object)
+          end
 
-        Notification::Instrument::Event::Handler::Flowdock.attach_to(self)
+          Notification::Instrument::Event::Handler::Flowdock.attach_to(self)
       end
     end
   end

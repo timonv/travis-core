@@ -16,11 +16,12 @@ describe Travis::Task::Campfire do
     Travis::Features.stubs(:active?).returns(true)
     Repository.stubs(:find).returns(stub('repo'))
     Url.stubs(:shorten).returns(url)
+    Broadcast.stubs(:by_repo).returns([broadcast])
   end
 
   def run(targets, build)
     data = Travis::Api.data(build, :for => 'event', :version => 'v2')
-    Travis::Task.run(:campfire, data, :targets => targets)
+    Travis::Task::Campfire.new(data, :targets => targets).run
   end
 
   [['account', 'token'],
@@ -31,8 +32,8 @@ describe Travis::Task::Campfire do
 
       expect_campfire(account, 1234, token, [
         '[travis-ci] svenfuchs/minimal#2 (master - 62aae5f : Sven Fuchs): the build has passed',
-        '[travis-ci] Change view: http://trvs.io/short',
-        "[travis-ci] Build details: http://trvs.io/short"
+        '[travis-ci] Change view: https://github.com/svenfuchs/minimal/compare/master...develop',
+        '[travis-ci] Build details: http://travis-ci.org/svenfuchs/minimal/builds/1'
       ])
       run(targets, build)
       http.verify_stubbed_calls

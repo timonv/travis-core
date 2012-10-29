@@ -10,13 +10,19 @@ require 'active_record'
 class Job < ActiveRecord::Base
   autoload :Compat,    'travis/model/job/compat'
   autoload :Cleanup,   'travis/model/job/cleanup'
-  autoload :Limit,     'travis/model/job/limit'
   autoload :Queue,     'travis/model/job/queue'
-  autoload :Queueing,  'travis/model/job/queueing'
   autoload :States,    'travis/model/job/states'
   autoload :Sponsors,  'travis/model/job/sponsors'
   autoload :Tagging,   'travis/model/job/tagging'
   autoload :Test,      'travis/model/job/test'
+
+  class Queueing
+    class All
+      def run
+        Service::Jobs::Enqueue.run # bc, remove once apps use the service directly
+      end
+    end
+  end
 
   class << self
     # what we return from the json api
@@ -107,6 +113,7 @@ class Job < ActiveRecord::Base
 
     def process_env(env)
       env = [env] unless env.is_a?(Array)
+      env = normalize_env(env)
       env = if pull_request?
         remove_encrypted_env_vars(env)
       else
@@ -118,6 +125,16 @@ class Job < ActiveRecord::Base
     def remove_encrypted_env_vars(env)
       env.reject do |var|
         var.is_a?(Hash) && var.has_key?(:secure)
+      end
+    end
+
+    def normalize_env(env)
+      env.map do |line|
+        if line.is_a?(Hash) && !line.has_key?(:secure)
+          line.map { |k, v| "#{k}=#{v}" }.join(' ')
+        else
+          line
+        end
       end
     end
 

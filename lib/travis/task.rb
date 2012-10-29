@@ -23,38 +23,35 @@ module Travis
     extend  Instrumentation, NewRelic, Exceptions::Handling, Async
 
     class << self
-      def run(type, data, options = {})
-        if run_local?
-          const_get(type.to_s.camelize).new(data, options).run
-        else
-          publisher('tasks').publish(:type => type, :data => data, :options => options)
-        end
+      extend Exceptions::Handling
+
+      def run(type, *args)
+        Travis::Async.run(self, :perform, { :queue => type, :use => run_local? ? :threaded : :sidekiq }, type, *args)
       end
 
       def run_local?
         Travis::Features.feature_inactive?(:travis_tasks)
       end
 
-      def publisher(queue)
-        Travis::Amqp::Publisher.new(queue)
+      def perform(type, *args)
+        const_get(type.to_s.camelize).new(*args).run
       end
+      rescues :perform, :from => Exception
     end
 
     attr_reader :data, :options
 
     def initialize(data, options = {})
       @data = data
-      @options = options
+      @options = options.symbolize_keys
     end
 
     def run
       process
     end
-
     rescues    :run, :from => Exception
     instrument :run
     new_relic  :run, :category => :task
-    async      :run # unless Travis.env == 'staging'
 
     private
 
