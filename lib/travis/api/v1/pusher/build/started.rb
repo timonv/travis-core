@@ -19,6 +19,7 @@ module Travis
                 'result' => nil,
                 'started_at' => format_date(build.started_at),
                 'commit' => commit.commit,
+                'commit_id' => commit.id,
                 'branch' => commit.branch,
                 'message' => commit.message,
                 'compare_url' => commit.compare_url,
@@ -30,9 +31,7 @@ module Travis
                 'event_type' => request.event_type,
                 'matrix' => build.matrix.map { |job| Job.new(job).data },
                 'job_ids' => build.matrix.map(&:id),
-                'finished_at' => format_date(build.finished_at),
-                'state' => build.state.to_s,
-                'duration' => build.duration
+                'state' => build.state.to_s
               }
             end
 

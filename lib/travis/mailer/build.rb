@@ -9,20 +9,22 @@ module Travis
 
       attr_reader :build, :commit, :repository, :jobs
 
-      def finished_email(data, recipients)
-        @build = Hashr.new(data['build'])
-        @repository = Hashr.new(data['repository'])
-        @broadcast = Hashr.new(data['broadcasts'].first)
-        @commit = Hashr.new(data['commit'])
-        @jobs   = data['jobs'].map { |job| Hashr.new(job) }
+      def finished_email(data, recipients, broadcasts)
+        data = data.deep_symbolize_keys
 
-        mail(:from => from, :to => recipients, :subject => subject, :template_path => 'build')
+        @build      = Hashr.new(data[:build])
+        @repository = Hashr.new(data[:repository])
+        @commit     = Hashr.new(data[:commit])
+        @jobs       = data[:jobs].map { |job| Hashr.new(job) }
+        @broadcasts = Array(broadcasts).map { |broadcast| Hashr.new(broadcast) }
+
+        mail(from: from, to: recipients, subject: subject, template_path: 'build')
       end
 
       private
 
         def subject
-          "[#{result_message(build)}] #{repository['slug']}##{build['number']} (#{commit['branch']} - #{commit['sha'][0..6]})"
+          "[#{result_message(build)}] #{repository.slug}##{build.number} (#{commit.branch} - #{commit.sha[0..6]})"
         end
 
         def from

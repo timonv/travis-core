@@ -13,6 +13,16 @@ module Travis
     # Subscribing classes are supposed to define an EVENTS constant which holds
     # a regular expression which will be matched against the event name.
     class Subscription
+      class << self
+        def register(name, const)
+          handlers[name.to_sym] = const
+        end
+
+        def handlers
+          @handlers ||= {}
+        end
+      end
+
       attr_reader :name
 
       def initialize(name)
@@ -20,9 +30,9 @@ module Travis
       end
 
       def subscriber
-        Handler.const_get(name.to_s.camelize)
+        self.class.handlers[name.to_sym] || Handler.const_get(name.to_s.camelize, false)
       rescue NameError => e
-        Travis::Exceptions.handle(e)
+        puts "Could not find event handler #{name.inspect}, ignoring."
       end
 
       def patterns

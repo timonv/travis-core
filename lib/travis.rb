@@ -1,5 +1,6 @@
 require 'travis/support'
 require 'gh'
+require 'pusher'
 
 autoload :Account,      'travis/model/account'
 autoload :Artifact,     'travis/model/artifact'
@@ -41,6 +42,7 @@ autoload :Worker,       'travis/model/worker'
 # (needed in travis-hub in order to connect to the database) and Travis::Renderer
 # (our inferior layer on top of Rabl).
 module Travis
+  autoload :Addons,       'travis/addons'
   autoload :Api,          'travis/api'
   autoload :Config,       'travis/config'
   autoload :Event,        'travis/event'
@@ -51,6 +53,8 @@ module Travis
   autoload :Services,     'travis/services'
   autoload :Task,         'travis/task'
   autoload :Testing,      'travis/testing'
+
+  extend Services
 
   class UnknownRepository < StandardError; end
   class GithubApiError < StandardError; end
@@ -63,6 +67,7 @@ module Travis
       @config ||= Config.new
     end
 
+    # TODO check with @rkh where this is actually required
     def setup(config = Travis.config.oauth2)
       GH.set(:client_id => config[:client_id], :client_secret => config[:client_secret]) if config
     end
