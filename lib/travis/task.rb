@@ -1,3 +1,5 @@
+puts 'loading travis/task.rb'
+
 require 'faraday'
 require 'core_ext/hash/compact'
 require 'core_ext/hash/deep_symbolize_keys'
