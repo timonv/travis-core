@@ -6,6 +6,8 @@ class BuildMock
   attr_accessor :state, :result, :started_at, :finished_at, :duration
   def denormalize(*); end
   def id; 1; end
+  def errors; []; end
+  def valid?; true; end
 end
 
 describe Build::States do
