@@ -5,6 +5,7 @@ class BuildMock
   class << self; def name; 'Build'; end; end
   attr_accessor :state, :result, :started_at, :finished_at, :duration
   def denormalize(*); end
+  def id; 1; end
 end
 
 describe Build::States do

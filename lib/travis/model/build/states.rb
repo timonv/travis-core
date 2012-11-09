@@ -32,6 +32,9 @@ class Build
     end
 
     def finish(data = {})
+      Travis.logger.info "[build:states] finish event called for Build:#{id}" +
+                         " (result: #{matrix_result}, duration: #{matrix_duration}," +
+                         " finished_at: #{data[:finished_at]})"
       self.result = matrix_result
       self.duration = matrix_duration
       self.finished_at = data[:finished_at]

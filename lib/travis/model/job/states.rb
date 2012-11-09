@@ -21,6 +21,7 @@ class Job
     end
 
     def propagate(*args)
+      Travis.logger.info "[job:states] Job:#{id} propagates to Build:#{source.id} - #{args.inspect}"
       source.send(*args)
       true
     end

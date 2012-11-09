@@ -15,7 +15,8 @@ class TestMock
   include Job::Test::States
 
   attr_accessor :state, :config, :result, :started_at, :finished_at, :worker
-  def source; @source ||= stub('build', :start => nil, :finish => nil, :state => nil, :state= => nil) end
+  def id; 1; end
+  def source; @source ||= stub('build', :id => 1, :start => nil, :finish => nil, :state => nil, :state= => nil) end
   def log; @log ||= stub('artifact', :content => nil, :update_attributes! => nil) end
   def save!; end
   def denormalize(*); end
