@@ -8,6 +8,7 @@ class BuildMock
   def id; 1; end
   def errors; []; end
   def valid?; true; end
+  def save!; true; end
 end
 
 describe Build::States do

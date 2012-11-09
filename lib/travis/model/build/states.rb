@@ -40,6 +40,9 @@ class Build
       self.result = matrix_result
       self.duration = matrix_duration
       self.finished_at = data[:finished_at]
+
+      Travis.logger.info "[build:states] Trying to force save of the Build:#{id}"
+      save!
     end
 
     def pending?
